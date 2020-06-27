@@ -1,0 +1,60 @@
+---
+title: "Project 2"
+author: "Avy Harvey"
+date: "6/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Goal
+
+The goal is to create models for predicting the shares variable from the dataset. You will create two models: a
+linear regression model and a non-linear model (each of your choice). You will use the parameter functionality
+of markdown to automatically generate an analysis report for each weekday_is_* variable (so you’ll end up
+with seven total outputted documents).
+
+At first, consider just using the ‘Monday’ data. Once you have all of the below steps done for that data, then
+automate it to work with any chosen day of the week data.
+
+## Introduction
+
+You should have an introduction section that describes the data, the purpose of your analysis, and the methods you'll use (roughly -- more detail can be given later in the document)
+
+## Data
+
+You should briefly describe the data and the variables you have to work with (no need to discuss all of them, just the ones you want to use).
+
+You should randomly sample from (say using sample()) the (Monday) data in order to form a training (70% of the data) and test set (30% of the data). You should set the seed to make your work reproducible.
+
+## Summarizations
+
+You should produce some basic (but meaningful) summary statistics about the training data you are working
+with. The general things that the plots describe should be explained but, since we are going to automate
+things, there is no need to try and explain particular trends in the plots you see (unless you want to try and
+automate that too!).
+
+## Modeling
+
+Once you have your training data set, we are ready to fit some models.
+You should fit two types of models to predict the shares. One model should be an ensemble model (bagged
+trees, random forests, or boosted trees) and one should be a linear regression model (or collection of them
+that you’ll choose from).
+
+The article referenced in the UCI website mentions that they made the problem into a binary classification
+problem by dividing the shares into two groups (< 1400 and ≥ 1400), you can do this if you’d like or simply
+try to predict the shares themselves.
+
+Feel free to use code similar to the notes or use the caret package.
+
+After training/tuning your two types of models (linear and non-linear) using cross-validation, AIC, or your
+preferred method (all on the training data set only!) you should then compare them on the test set. Your
+methodology for choosing your model during the training phase should be explained.
+
+## Automation
+
+Once you’ve completed the above for Monday, adapt the code so that you can use a parameter in your build
+process that will cycle through the weekday_is_* variables.
