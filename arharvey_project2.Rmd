@@ -218,7 +218,7 @@ that you’ll choose from).~~
 
 The ensemble model that I will try is a random forest. I will preprocess the predictor variables with centering and scaling. I will use repeated 10-fold cross validation to select the best value of `mtry` (the parameter which controls how many predictors are randomly sampled at each split), among several distinct values of `mtry`. That model will be the selected candidate model for Random Forest.
 
-```{r}
+```{r ensemble_train, cache=TRUE}
 # Process training in parallel
 # Referenced caret vignette at https://topepo.github.io/caret/parallel-processing.html
 cl <- makePSOCKcluster(8)
@@ -247,7 +247,7 @@ random_forest_fit
 
 The linear model that I will try is logistic regression since the target is binary. I will preprocess the predictor variables with centering and scaling. I'll also be using Lasso regularization during training by fixing the `alpha` parameter at 1 ([source link](https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html)). Lasso regularization penalizes model complexity by setting the parameter estimates for unimportant variables to zero, effectively acting as a form of feature selection. I will use repeated 10-fold cross validation to select the best value of `lambda` (the regularization parameter). That model will be the selected candidate model for Logistic Regression.
 
-```{r}
+```{r linear_train, cache=TRUE}
 # Process training in parallel
 # Referenced caret vignette at https://topepo.github.io/caret/parallel-processing.html
 cl <- makePSOCKcluster(8)
