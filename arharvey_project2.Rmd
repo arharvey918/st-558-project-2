@@ -8,6 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(caret)
+library(glmnet)  # For LASSO-regularized logistic regression
+library(doParallel)  # For parallelizing model building
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -23,7 +25,7 @@ automate it to work with any chosen day of the week data.~~
 
 ## Introduction
 
-The purpose of this project is to build models to predict the number of social media shares that an online news article will receive. Specifically, I will train several linear regression models and random forest models, and use repeated 10-fold cross-validation to select a single champion model for each type of algorithm. This process will be repeated for every day of the week on which an article can be published (i.e., Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday).
+The purpose of this project is to build models to predict the number of social media shares that an online news article will receive. Specifically, I will train several logistic regression models and random forest models, use repeated 10-fold cross-validation to select a single candidate model for each type of algorithm, then compare those candidate models on the holdout test data set. This process will be repeated for every day of the week on which an article can be published (i.e., Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday).
 
 The data used in this project is the [Online News Popularity](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) data set available from the UCI Machine Learning Repository. All of the news articles in referenced in this data set were published by [Mashable](https://www.mashable.com), and can be referenced using the `url` variable. The data dictionary is available on the UCI website for the data set linked above.
 
@@ -136,7 +138,7 @@ summary(df$title_subjectivity)
 df %>%
   filter(shares < 3 * sd(shares)) %>%  # Exclude outliers
   ggplot(aes(x = title_subjectivity, y = shares)) +
-  geom_point(alpha = 0.25) +
+  geom_point(alpha = 0.25)
   labs(title = "Shares vs. Title Subjectivity", x = "Title Subjectivity", y = "Number of Shares")
 ```
 
@@ -184,6 +186,15 @@ df %>%
 
 ## Modeling
 
+I'm going to turn this problem into a binary classification problem by splitting the `shares` variable into two groups: $shares \lt 1400$ and $shares \ge 1400$.
+
+```{r}
+df_bin <- df %>%
+  mutate(sharesBin = as_factor(ifelse(shares < 1400, 0, 1))) %>%
+  select(-shares)
+```
+
+
 Before I start training my models, I'll split the data into a train and test set using random sampling:
 
 ```{r}
@@ -191,29 +202,110 @@ Before I start training my models, I'll split the data into a train and test set
 set.seed(1)
 
 # Sample training indices
-train_index <- createDataPartition(df$shares, p = .7)[[1]]
+train_index <- createDataPartition(df_bin$sharesBin, p = .7)[[1]]
 
 # Create train and test sets
-df_train <- df[train_index,]
-df_test <- df[-train_index,]
+df_train <- df_bin[train_index,]
+df_test <- df_bin[-train_index,]
 ```
 
-Once you have your training data set, we are ready to fit some models.
+~~Once you have your training data set, we are ready to fit some models.
 You should fit two types of models to predict the shares. One model should be an ensemble model (bagged
 trees, random forests, or boosted trees) and one should be a linear regression model (or collection of them
-that you’ll choose from).
+that you’ll choose from).~~
 
-The article referenced in the UCI website mentions that they made the problem into a binary classification
+### Random Forest
+
+The ensemble model that I will try is a random forest. I will preprocess the predictor variables with centering and scaling. I will use repeated 10-fold cross validation to select the best value of `mtry` (the parameter which controls how many predictors are randomly sampled at each split), among several distinct values of `mtry`. That model will be the selected candidate model for Random Forest.
+
+```{r}
+# Process training in parallel
+# Referenced caret vignette at https://topepo.github.io/caret/parallel-processing.html
+cl <- makePSOCKcluster(8)
+registerDoParallel(cl)
+
+# Set seed for reproducibility
+set.seed(1)
+
+# Do repeated cross validation 3 times
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+
+# Build the random forest model using 10 different values of mtry
+random_forest_fit <- train(sharesBin ~ ., data = df_train, method = "rf",
+ trControl=train_control,
+ preProcess = c("center", "scale"),
+ tuneGrid = expand.grid(.mtry = c(2:8, 15, 30, 45)))
+
+# Turn off the cluster for parallel processing
+stopCluster(cl)
+
+# Show the results
+random_forest_fit
+```
+
+### Logistic Regression
+
+The linear model that I will try is logistic regression since the target is binary. I will preprocess the predictor variables with centering and scaling. I'll also be using Lasso regularization during training by fixing the `alpha` parameter at 1 ([source link](https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html)). Lasso regularization penalizes model complexity by setting the parameter estimates for unimportant variables to zero, effectively acting as a form of feature selection. I will use repeated 10-fold cross validation to select the best value of `lambda` (the regularization parameter). That model will be the selected candidate model for Logistic Regression.
+
+```{r}
+# Process training in parallel
+# Referenced caret vignette at https://topepo.github.io/caret/parallel-processing.html
+cl <- makePSOCKcluster(8)
+registerDoParallel(cl)
+
+# Set seed for reproducibility
+set.seed(1)
+
+# Do repeated cross validation 3 times
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+
+# Build the LASSO logistic regression models with different values for lambda
+log_reg_fit <- train(sharesBin ~ ., data = df_train, method = "glmnet", family = "binomial",
+ trControl=train_control,
+ preProcess = c("center", "scale"),
+ tuneGrid = expand.grid(.alpha = 1, .lambda = 10^(seq(-5,0, by=0.25))))
+
+# Turn off the cluster for parallel processing
+stopCluster(cl)
+
+# Show the results
+log_reg_fit
+```
+
+~~The article referenced in the UCI website mentions that they made the problem into a binary classification
 problem by dividing the shares into two groups (< 1400 and ≥ 1400), you can do this if you’d like or simply
-try to predict the shares themselves.
+try to predict the shares themselves.~~
 
-Feel free to use code similar to the notes or use the caret package.
+~~Feel free to use code similar to the notes or use the caret package.~~
 
-After training/tuning your two types of models (linear and non-linear) using cross-validation, AIC, or your
+~~After training/tuning your two types of models (linear and non-linear) using cross-validation, AIC, or your
 preferred method (all on the training data set only!) you should then compare them on the test set. Your
-methodology for choosing your model during the training phase should be explained.
+methodology for choosing your model during the training phase should be explained.~~
+
+### Model Comparison
+
+Now that we have trained a GLM and a non-linear model, let's compare their accuracy on the holdout test data set.
+
+```{r}
+get_test_accuracy <- function(model) {
+  # Create confusion matrix from predictions
+  confusion_matrix <- predict(model, newdata = df_test) %>%
+    table(df_test$sharesBin)
+  
+  # Return accuracy rate
+  sum(diag(confusion_matrix))/sum(confusion_matrix)
+}
+
+list("Random Forest" = random_forest_fit, "Logistic Regression" = log_reg_fit) %>%
+  sapply(get_test_accuracy) %>%
+  knitr::kable(caption = "Model Accuracy on Test Set", col.names = "Accuracy")
+```
+
 
 ## Automation
 
 Once you’ve completed the above for Monday, adapt the code so that you can use a parameter in your build
 process that will cycle through the weekday_is_* variables.
+
+
+
