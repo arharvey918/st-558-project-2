@@ -3,6 +3,8 @@ title: "Project 2"
 author: "Avy Harvey"
 date: "6/27/2020"
 output: html_document
+params:
+  day: "weekday_is_monday"
 ---
 
 ```{r setup, include=FALSE}
@@ -18,14 +20,16 @@ knitr::opts_chunk$set(echo = TRUE)
 ~~The goal is to create models for predicting the shares variable from the dataset. You will create two models: a
 linear regression model and a non-linear model (each of your choice). You will use the parameter functionality
 of markdown to automatically generate an analysis report for each weekday_is_* variable (so you’ll end up
-with seven total outputted documents).
+with seven total outputted documents).~~
 
-At first, consider just using the ‘Monday’ data. Once you have all of the below steps done for that data, then
+~~At first, consider just using the ‘Monday’ data. Once you have all of the below steps done for that data, then
 automate it to work with any chosen day of the week data.~~
 
 ## Introduction
 
 The purpose of this project is to build models to predict the number of social media shares that an online news article will receive. Specifically, I will train several logistic regression models and random forest models, use repeated 10-fold cross-validation to select a single candidate model for each type of algorithm, then compare those candidate models on the holdout test data set. This process will be repeated for every day of the week on which an article can be published (i.e., Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday).
+
+This particular report focuses on the data filtered for **``r params$day``**.
 
 The data used in this project is the [Online News Popularity](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) data set available from the UCI Machine Learning Repository. All of the news articles in referenced in this data set were published by [Mashable](https://www.mashable.com), and can be referenced using the `url` variable. The data dictionary is available on the UCI website for the data set linked above.
 
@@ -43,11 +47,11 @@ Most of the remaining predictor variables are derived using natural language pro
 
 Because there are so many variables, I will need to do some variable selection to reduce the dimensionality of the data set, which will hopefully result in simpler models that are able to better generalize to the data.
 
-First, I'll read in the data, filter it for the weekday for which I will build a model, and remove the columns that I won't be using:
+First, I'll read in the data, filter it for the weekday for which I will build a model (`r params$day`), and remove the columns that I won't be using:
 
 ```{r}
 df <- read_csv("data/OnlineNewsPopularity.csv") %>%
-  filter(weekday_is_monday == 1) %>%
+  filter(!!sym(params$day) == 1) %>%  # !!sym() evaluates the provided column for dplyr
   select(-starts_with("weekday_is_"), -is_weekend, -url, -timedelta)
 ```
 
@@ -304,8 +308,28 @@ list("Random Forest" = random_forest_fit, "Logistic Regression" = log_reg_fit) %
 
 ## Automation
 
-Once you’ve completed the above for Monday, adapt the code so that you can use a parameter in your build
-process that will cycle through the weekday_is_* variables.
+~~Once you’ve completed the above for Monday, adapt the code so that you can use a parameter in your build
+process that will cycle through the weekday_is_* variables.~~
 
+This code was used to create reports for all of the `weekday_is_*` variables. It can be executed in R to recreate the reports.
+
+```{r create_reports, eval=FALSE}
+# Code referenced from class notes
+weekday_vars = list("weekday_is_monday", "weekday_is_tuesday", "weekday_is_wednesday",
+                  "weekday_is_thursday", "weekday_is_friday", "weekday_is_saturday",
+                  "weekday_is_sunday")
+
+# Create output file names and parameter lists
+output_file <- paste0(weekday_vars, ".md")
+params = lapply(weekday_vars, FUN = function(x){list(day = x)})
+
+# Create tibble of reports to create
+reports <- tibble(output_file, params)
+
+# Create reports
+pwalk(reports, rmarkdown::render,
+      input = "arharvey_project2.Rmd",
+      output_format = rmarkdown::github_document(toc = TRUE))
+```
 
 
