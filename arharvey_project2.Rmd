@@ -5,6 +5,7 @@ date: "6/27/2020"
 output:
   rmarkdown::github_document:
     toc: true
+    pandoc_args: --webtex
 params:
   day: "weekday_is_monday"  # Switch this to whatever weekday variable you want
 ---
@@ -110,7 +111,7 @@ df %>%
   pivot_longer(-shares, names_to="Channel") %>%
   filter(value == 1 & shares < 3 * sd(df$shares)) %>%  # Exclude outliers
   ggplot(aes(x = Channel, y = shares)) +
-  geom_boxplot(aes(fill = Channel)) +
+  geom_boxplot(aes(fill = Channel), show.legend = FALSE) +
   labs(title = "Number of Shares by Channel", y = "Number of Shares")
 ```
 
@@ -130,7 +131,7 @@ summary(df$title_subjectivity)
 df %>%
   filter(shares < 3 * sd(shares)) %>%  # Exclude outliers
   ggplot(aes(x = title_subjectivity, y = shares)) +
-  geom_point(alpha = 0.25)
+  geom_point(alpha = 0.25) +
   labs(title = "Shares vs. Title Subjectivity", x = "Title Subjectivity", y = "Number of Shares")
 ```
 
@@ -294,6 +295,6 @@ reports <- tibble(output_file, params)
 # Create reports
 pwalk(reports, rmarkdown::render,
       input = "arharvey_project2.Rmd",
-      output_format = rmarkdown::github_document(toc = TRUE))
+      output_format = rmarkdown::github_document(toc = TRUE, pandoc_args = "--webtex"))
 ```
 
