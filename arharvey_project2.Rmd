@@ -36,8 +36,6 @@ The other predictor variables attempt to measure a number of things. Some metada
 
 Most of the remaining predictor variables are derived using natural language processing techniques. These include variables that tokenize the text and provide counts, such as number of tokens in the title, article content, stop words, and unique tokens. There is another set of indicator variables that is created from a form of unsupervised clustering in natural language processing, called Latent Dirichlet allocation (LDA). There are also variables related to article sentiment and polarity. These variables describe the overall feeling that an article's text provides, as well as describing how polarizing the language in the title is.
 
-Because there are so many variables, I will need to do some variable selection to reduce the dimensionality of the data set, which will hopefully result in simpler models that are able to better generalize to the data.
-
 First, I'll read in the data, filter it for the weekday for which I will build a model (`r params$day`), and remove the columns that I won't be using:
 
 ```{r}
