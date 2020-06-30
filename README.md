@@ -7,6 +7,7 @@ Avy Harvey
   - [Data](#data)
   - [Reports](#reports)
   - [Automation](#automation)
+  - [Conclusion](#conclusion)
 
 ## Introduction
 
@@ -58,9 +59,11 @@ language in the title is.
 ## Reports
 
 As previously mentioned, I created reports for every weekday. Each
-report contains the above Intro and Data sections, along with
-summarizations and models specific to the analyzed day. You can
-view them by using the following links for the respective weekday:
+report contains the above Introduction and Data sections, along with
+summarizations and models specific to the analyzed day by filtering
+the data for that particular weekday using the `weekday_is_*`
+indicator variables. You can view them by using the following links
+for the respective weekday:
 
 * [Monday](weekday_is_monday.md)
 * [Tuesday](weekday_is_tuesday.md)
@@ -93,3 +96,15 @@ pwalk(reports, rmarkdown::render,
       input = "arharvey_project2.Rmd",
       output_format = rmarkdown::github_document(toc = TRUE, pandoc_args = "--webtex"))
 ```
+
+## Conclusion
+
+Overall, the champion Random Forest and Logistic Regression models performed similarly to each other in terms of accuracy on the holdout test data on each day. The Random Forest model beat out the Logistic Regression model on the holdout test data on every day except Saturday. During the weekdays, the accuracy was around 62-66%, but jumped to 70-75% on the weekend, with Saturday's models yielding the highest accuracy.
+
+The Random Forest model from Thursday had the highest accuracy rate of any *weekday* model with a rate of 66.63% on the holdout test data. The Logistic Regression model from Satuday had the highest accuracy rate of any model across all days with a rate of 75.64% on the holdout test data.
+
+Speculating behind that jump in accuracy, it could be because people may have a habit of looking at the news before or after going to work on weekdays, and interact more frequently with online news articles on those days. This could increase the variance in some of the features on those days. People don't typically work on weekends, and may be more likely to interact with other news items.
+
+Another possible explanation could be that there are fewer news items published on weekends since that's when most industries take a break, and people may be more likely to interact with certain categories on those days.
+
+One thing that I should note about the models that I built is that they're not easily interpretable by the average person, particularly Random Forests. While logistic regression can be interpreted with the beta values as odds-ratios, that interpretation can be difficult for the average person. A decision tree, on the other hand, is easier to interpret as a series of yes/no questions, but may perform worse than the chosen models in terms of predictive accuracy. As with most things, there's a trade-off.
