@@ -99,6 +99,8 @@ pwalk(reports, rmarkdown::render,
 
 ## Conclusion
 
+The results that I saw for prediction accuracy were similar to what was reported in the original academic paper referenced on the UCI website, though they did not separate their data based on weekday. This was the primary driver behind choosing to make this a classification problem rather than a regression problem; I wanted to have a reference point for the kind of prediction accuracy I should expect.
+
 Overall, the champion Random Forest and Logistic Regression models performed similarly to each other in terms of accuracy on the holdout test data on each day. The Random Forest model beat out the Logistic Regression model on the holdout test data on every day except Saturday. During the weekdays, the accuracy was around 62-66%, but jumped to 70-75% on the weekend, with Saturday's models yielding the highest accuracy.
 
 The Random Forest model from Thursday had the highest accuracy rate of any *weekday* model with a rate of 66.63% on the holdout test data. The Logistic Regression model from Satuday had the highest accuracy rate of any model across all days with a rate of 75.64% on the holdout test data.
