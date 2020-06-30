@@ -15,7 +15,10 @@ library(tidyverse)
 library(caret)
 library(glmnet)  # For LASSO-regularized logistic regression
 library(doParallel)  # For parallelizing model building
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      # Set cache path
+                      # Referenced https://github.com/rstudio/rmarkdown/issues/114
+                      cache.path = paste0(params$day, "_cache/"))
 ```
 
 ## Introduction
@@ -172,7 +175,7 @@ df %>%
 
 ## Modeling
 
-I'm going to turn this problem into a binary classification problem by splitting the `shares` variable into two groups: $shares \lt 1400$ and $shares \ge 1400$.
+I'm going to turn this problem into a binary classification problem by splitting the `shares` variable into two groups: $shares < 1400$ and $shares \ge 1400$.
 
 ```{r}
 df_bin <- df %>%

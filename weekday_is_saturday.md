@@ -261,8 +261,8 @@ df %>%
 
 I’m going to turn this problem into a binary classification problem by
 splitting the `shares` variable into two groups: ![shares
-\\lt 1400](https://latex.codecogs.com/png.latex?shares%20%5Clt%201400
-"shares \\lt 1400") and ![shares
+\< 1400](https://latex.codecogs.com/png.latex?shares%20%3C%201400
+"shares \< 1400") and ![shares
 \\ge 1400](https://latex.codecogs.com/png.latex?shares%20%5Cge%201400
 "shares \\ge 1400").
 

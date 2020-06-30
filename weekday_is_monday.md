@@ -123,7 +123,7 @@ df %>%
   labs(title = "Histogram of Shares", x = "Number of Shares", y = "Number of Articles")
 ```
 
-![](weekday_is_monday_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](weekday_is_monday_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ### Channel/Topic
 
@@ -152,7 +152,7 @@ df %>%
   labs(title = "Number of Articles by Channel", y = "Number of Articles")
 ```
 
-![](weekday_is_monday_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](weekday_is_monday_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 Next, I want to explore the distribution of shares for each of those
 channels. This can help me understand which channels may be associated
@@ -176,7 +176,7 @@ df %>%
   labs(title = "Number of Shares by Channel", y = "Number of Shares")
 ```
 
-![](weekday_is_monday_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](weekday_is_monday_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ### Sentiment
 
@@ -205,7 +205,7 @@ df %>%
   labs(title = "Shares vs. Title Subjectivity", x = "Title Subjectivity", y = "Number of Shares")
 ```
 
-![](weekday_is_monday_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](weekday_is_monday_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 **Q: How does text sentiment polarity affect number of shares?**
 
@@ -231,7 +231,7 @@ df %>%
   labs(title = "Shares vs. Text Sentiment Polarity", x = "Text Sentiment Polarity", y = "Number of Shares")
 ```
 
-![](weekday_is_monday_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](weekday_is_monday_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ### LDA
 
@@ -255,14 +255,14 @@ df %>%
   labs(title = "Shares by LDA Topic", x = "LDA Topic", y = "Number of Shares")
 ```
 
-![](weekday_is_monday_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](weekday_is_monday_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ## Modeling
 
 I’m going to turn this problem into a binary classification problem by
 splitting the `shares` variable into two groups: ![shares
-\\lt 1400](https://latex.codecogs.com/png.latex?shares%20%5Clt%201400
-"shares \\lt 1400") and ![shares
+\< 1400](https://latex.codecogs.com/png.latex?shares%20%3C%201400
+"shares \< 1400") and ![shares
 \\ge 1400](https://latex.codecogs.com/png.latex?shares%20%5Cge%201400
 "shares \\ge 1400").
 
