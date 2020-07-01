@@ -49,12 +49,12 @@ Most of the remaining predictor variables are derived using natural
 language processing techniques. These include variables that tokenize
 the text and provide counts, such as number of tokens in the title,
 article content, stop words, and unique tokens. There is another set of
-indicator variables that is created from a form of unsupervised
-clustering in natural language processing, called Latent Dirichlet
-allocation (LDA). There are also variables related to article sentiment
-and polarity. These variables describe the overall feeling that an
-article’s text provides, as well as describing how polarizing the
-language in the title is.
+indicator variables that were created from a generative probabilistic
+model called Latent Dirichlet allocation (LDA)
+([source](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf)).
+There are also variables related to article sentiment and polarity.
+These variables describe the subjectivity of an article’s text, as well
+as describing how positive or negative the language is.
 
 ## Reports
 

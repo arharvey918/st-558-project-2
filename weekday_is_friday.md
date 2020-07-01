@@ -9,7 +9,6 @@ Avy Harvey
       - [Shares](#shares)
       - [Channel/Topic](#channeltopic)
       - [Sentiment](#sentiment)
-      - [LDA](#lda)
   - [Modeling](#modeling)
       - [Random Forest](#random-forest)
       - [Logistic Regression](#logistic-regression)
@@ -59,12 +58,12 @@ Most of the remaining predictor variables are derived using natural
 language processing techniques. These include variables that tokenize
 the text and provide counts, such as number of tokens in the title,
 article content, stop words, and unique tokens. There is another set of
-indicator variables that is created from a form of unsupervised
-clustering in natural language processing, called Latent Dirichlet
-allocation (LDA). There are also variables related to article sentiment
-and polarity. These variables describe the overall feeling that an
-article’s text provides, as well as describing how polarizing the
-language in the title is.
+indicator variables that were created from a generative probabilistic
+model called Latent Dirichlet allocation (LDA)
+([source](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf)).
+There are also variables related to article sentiment and polarity.
+These variables describe the subjectivity of an article’s text, as well
+as describing how positive or negative the language is.
 
 First, I’ll read in the data, filter it for the weekday for which I will
 build a model (weekday\_is\_friday), and remove the columns that I won’t
@@ -233,30 +232,6 @@ df %>%
 
 ![](weekday_is_friday_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
-### LDA
-
-**Q: How does LDA closeness affect number of shares?**
-
-LDA closeness measures how close a document is to an unlabeled topic.
-This can be thought of as closeness to a centroid in k-means clustering,
-but for natural language processing. I want to see if particular LDA
-topics affect how often an article is shared.
-
-``` r
-df %>%
-  filter(shares < 3 * sd(shares)) %>%  # Exclude outliers
-  mutate(n = row_number()) %>%
-  pivot_longer(starts_with("LDA"), names_to = "LDA") %>%
-  group_by(n) %>%
-  # Code referenced from https://stackoverflow.com/a/29657877
-  slice(which.max(value)) %>%  # Don't drop other columns, but log max LDA
-  ggplot(aes(x = LDA, y = shares)) +
-  geom_boxplot(aes(fill = LDA), show.legend = FALSE) +
-  labs(title = "Shares by LDA Topic", x = "LDA Topic", y = "Number of Shares")
-```
-
-![](weekday_is_friday_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
-
 ## Modeling
 
 I’m going to turn this problem into a binary classification problem by
@@ -351,13 +326,15 @@ random_forest_fit
 
 The linear model that I will try is logistic regression since the target
 is binary. I will preprocess the predictor variables with centering and
-scaling. I’ll also be using Lasso regularization during training by
-fixing the `alpha` parameter at 1 ([source
-link](https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html)). Lasso
-regularization penalizes model complexity by setting the parameter
-estimates for unimportant variables to zero, effectively acting as a
-form of feature selection. I will use repeated 10-fold cross validation
-to select the best value of `lambda` (the regularization parameter).
+scaling. I’ll also be using the lasso penalty during training to help
+with feature selection, as LASSO may set some coefficients to exactly 0
+([source](https://statweb.stanford.edu/~owen/courses/305a/Rudyregularization.pdf)).
+LASSO can be used in `glmnet` by fixing the `alpha` parameter at 1
+([source
+link](https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html)). I
+will use repeated 10-fold cross validation to select the best value of
+the `lambda` parameter, which controls the strength of the penalty
+([source](https://web.stanford.edu/~hastie/glmnet/glmnet_alpha.html)).
 That model will be the selected candidate model for Logistic Regression.
 
 ``` r
@@ -445,7 +422,7 @@ list("Random Forest" = random_forest_fit, "Logistic Regression" = log_reg_fit) %
 
 |                     |  Accuracy |
 | ------------------- | --------: |
-| Random Forest       | 0.6477472 |
+| Random Forest       | 0.6489175 |
 | Logistic Regression | 0.6290228 |
 
 Model Accuracy on Test Set
