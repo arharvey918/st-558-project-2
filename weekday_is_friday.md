@@ -265,7 +265,7 @@ df_test <- df_bin[-train_index,]
 ### Random Forest
 
 The ensemble model that I will try is a random forest. I will preprocess
-the predictor variables with centering and scaling. I will use repeated
+the predictor variables with centering and scaling. I will use highest accuracy with repeated
 10-fold cross validation to select the best value of `mtry` (the
 parameter which controls how many predictors are randomly sampled at
 each split), among several distinct values of `mtry`. That model will be
